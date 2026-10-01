@@ -53,20 +53,20 @@ readonly class ProductBundleContext implements Context
         $this->createBundledProductPage->specifySlugIn($slug, $language);
     }
 
-    #[When('/^I set its(?:| default) price to "(?:€|£|\$)([^"]+)" for "([^"]+)" channel$/')]
+    #[When('/^I set its(?:| default) price to "(?:€|£|\$)([^"]+)" for ("[^"]+" channel)$/')]
     public function iSetItsPriceTo(string $price, ChannelInterface $channel): void
     {
         $this->createBundledProductPage->specifyPrice($channel, $price);
     }
 
-    #[When('/^I set its original price to "(?:€|£|\$)([^"]+)" for "([^"]+)" channel$/')]
-    public function iSetItsOriginalPriceTo(int $originalPrice, ChannelInterface $channel): void
+    #[When('/^I set its original price to "(?:€|£|\$)([^"]+)" for ("[^"]+" channel)$/')]
+    public function iSetItsOriginalPriceTo(string $originalPrice, ChannelInterface $channel): void
     {
-        $this->createBundledProductPage->specifyOriginalPrice($channel, $originalPrice);
+        $this->createBundledProductPage->specifyOriginalPrice($channel, (int) $originalPrice);
     }
 
     #[When('I add it')]
-    public function iAddIt()
+    public function iAddIt(): void
     {
         $this->createBundledProductPage->create();
     }
