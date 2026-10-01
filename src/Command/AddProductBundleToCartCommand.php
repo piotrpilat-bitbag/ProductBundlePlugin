@@ -13,11 +13,14 @@ declare(strict_types=1);
 
 namespace Sylius\ProductBundlePlugin\Command;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 final readonly class AddProductBundleToCartCommand implements OrderIdentityAwareInterface, ProductCodeAwareInterface
 {
     public function __construct(
         private int $orderId,
         private string $productCode,
+        #[Assert\Positive]
         private int $quantity = 1,
     ) {
     }

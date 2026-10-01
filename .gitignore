@@ -19,3 +19,12 @@
 
 /tests/TestApplication/.env.local
 /tests/TestApplication/.env.*.local
+/config/routes/
+/config/bundles.php
+/config/services.yaml
+/assets/controllers/
+/assets/styles/
+/assets/stimulus_bootstrap.js
+/assets/app.js
+/assets/controllers.json
+/assets/icons/
