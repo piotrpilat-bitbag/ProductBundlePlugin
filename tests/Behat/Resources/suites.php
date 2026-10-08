@@ -23,6 +23,7 @@ return (new Config())
             (new Suite('bundled_product'))
             ->withContexts(
                 'sylius.behat.context.hook.doctrine_orm',
+                'sylius_product_bundle_plugin.behat.context.hook.doctrine',
                 'sylius.behat.context.transform.lexical',
                 'sylius.behat.context.transform.product',
                 'sylius.behat.context.transform.address',

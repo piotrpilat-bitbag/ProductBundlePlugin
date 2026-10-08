@@ -15,11 +15,13 @@ namespace Tests\Sylius\ProductBundlePlugin\Behat\Context\Setup;
 
 use Behat\Behat\Context\Context;
 use Behat\Step\Given;
+use Behat\Transformation\Transform;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Behat\Service\SharedStorageInterface;
 use Sylius\Component\Core\Formatter\StringInflector;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ChannelPricingInterface;
+use Sylius\Component\Core\Model\ProductInterface as SyliusProductInterface;
 use Sylius\Component\Core\Model\ProductTaxonInterface;
 use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Core\Model\TaxonInterface;
@@ -30,6 +32,7 @@ use Sylius\Component\Resource\Factory\FactoryInterface;
 use Sylius\ProductBundlePlugin\Entity\ProductBundleItemInterface;
 use Sylius\ProductBundlePlugin\Entity\ProductInterface;
 use Sylius\ProductBundlePlugin\Factory\ProductFactory;
+use Webmozart\Assert\Assert;
 
 final class ProductBundleContext implements Context
 {
@@ -95,6 +98,24 @@ final class ProductBundleContext implements Context
     {
         $this->productRepository->add($product);
         $this->sharedStorage->set('product_with_bundle_item', $product);
+    }
+
+    #[Transform('/^product "([^"]+)"$/')]
+    #[Transform('/^"([^"]+)" product$/')]
+    public function getProductByName(string $productName): SyliusProductInterface
+    {
+        $products = $this->productRepository->findByName($productName, 'en_US');
+
+        Assert::eq(
+            count($products),
+            1,
+            sprintf('@Transform issue, cannot retrieve "%s" product', $productName),
+        );
+
+        /** @var SyliusProductInterface $product */
+        $product = $products[0];
+
+        return $product;
     }
 
     private function createProduct(

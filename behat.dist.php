@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Sylius ProductBundle Plugin package.
+ *
+ * (c) Sylius Sp. z o.o.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 use Behat\Config\Config;
@@ -14,13 +23,24 @@ use FriendsOfBehat\VariadicExtension\ServiceContainer\VariadicExtension;
 use SyliusLabs\SuiteTagsExtension\ServiceContainer\SuiteTagsExtension;
 
 $syliusSuitesPath = 'vendor/sylius/sylius/src/Sylius/Behat/Resources/config/suites';
+$ourSuitesPath = 'tests/Behat/Resources/suites';
+
+$imports = [];
+
+// Sylius: import .php if available (Behat 4.x requires .php, skip if not found)
+if (is_file(__DIR__ . '/' . $syliusSuitesPath . '.php')) {
+    $imports[] = $syliusSuitesPath . '.php';
+}
+
+// Our suites: .php (2.3+) or .yml (2.2)
+if (is_file(__DIR__ . '/' . $ourSuitesPath . '.php')) {
+    $imports[] = $ourSuitesPath . '.php';
+} elseif (is_file(__DIR__ . '/' . $ourSuitesPath . '.yml')) {
+    $imports[] = $ourSuitesPath . '.yml';
+}
 
 return (new Config())
-    ->import([
-        // Sylius 2.3+ has suites.php, 2.2 has suites.yml
-        is_file(__DIR__ . '/' . $syliusSuitesPath . '.php') ? $syliusSuitesPath . '.php' : $syliusSuitesPath . '.yml',
-        'tests/Behat/Resources/suites.php',
-    ])
+    ->import($imports)
     ->withProfile(
         (new Profile('default'))
             ->withExtension(new Extension(ChromeExtension::class))
@@ -42,8 +62,8 @@ return (new Config())
                         'chrome' => [
                             'api_url' => 'http://127.0.0.1:9222',
                             'validate_certificate' => false,
-                            'dom_wait_timeout' => 120,
-                            'socket_timeout' => 120,
+                            'dom_wait_timeout' => 300,
+                            'socket_timeout' => 300,
                         ],
                     ],
                 ],
@@ -62,4 +82,4 @@ return (new Config())
                 'paths' => ['features'],
             ])),
     )
-    ;
+;

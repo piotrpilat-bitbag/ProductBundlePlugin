@@ -14,13 +14,29 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Sylius\Behat\Service\Helper\AutocompleteHelperInterface;
+use Tests\Sylius\ProductBundlePlugin\Behat\Context\Hook\DoctrineContext;
 use Tests\Sylius\ProductBundlePlugin\Behat\Context\Setup\ProductBundleContext;
+use Tests\Sylius\ProductBundlePlugin\Behat\Context\Transform\ProductTransformContext;
 use Tests\Sylius\ProductBundlePlugin\Behat\Context\Ui\ProductBundleContext as UiProductBundleContext;
 use Tests\Sylius\ProductBundlePlugin\Behat\Page\Admin\CreateBundledProductPage;
 
 return static function (ContainerConfigurator $container): void {
     $services = $container->services();
     $services->defaults()->public();
+
+    $services->set('sylius_product_bundle_plugin.behat.context.hook.doctrine', DoctrineContext::class)
+        ->args([
+            service('doctrine.orm.entity_manager'),
+        ])
+        ->tag('behat.context')
+    ;
+
+    $services->set('sylius_product_bundle_plugin.behat.context.transform.product', ProductTransformContext::class)
+        ->args([
+            service('sylius.repository.product'),
+        ])
+        ->tag('behat.context')
+    ;
 
     $services->set('sylius_product_bundle_plugin.behat.context.setup.product_bundle', ProductBundleContext::class)
         ->args([
@@ -35,6 +51,7 @@ return static function (ContainerConfigurator $container): void {
             service('sylius.resolver.product_variant.default'),
             service('sylius.generator.slug'),
         ])
+        ->tag('behat.context')
     ;
 
     $services->set('sylius_product_bundle_plugin.behat.page.create_bundled_product_page', CreateBundledProductPage::class)
@@ -49,6 +66,10 @@ return static function (ContainerConfigurator $container): void {
     $services->set('sylius_product_bundle_plugin.behat.context.ui.product_bundle', UiProductBundleContext::class)
         ->args([
             service('sylius_product_bundle_plugin.behat.page.create_bundled_product_page'),
+            service('sylius.behat.shared_storage'),
+            service('sylius.behat.page.shop.cart_summary'),
+            service('behat.mink.default_session'),
         ])
+        ->tag('behat.context')
     ;
 };

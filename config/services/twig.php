@@ -47,12 +47,31 @@ return static function (ContainerConfigurator $container): void {
         ->tag('twig.extension')
     ;
 
+    // Bundle-aware replacement for the Sylius component
     $services->set('sylius_product_bundle.shop.twig.component.product.add_to_cart_form', AddToCartFormComponent::class)
-        ->parent('sylius_shop.twig.component.product.add_to_cart_form')
-        ->decorate('sylius_shop.twig.component.product.add_to_cart_form')
         ->args([
+            service('form.factory'),
+            service('doctrine.orm.entity_manager'),
+            service('router'),
+            service('request_stack'),
+            service('event_dispatcher'),
+            service('sylius.context.cart'),
+            service('sylius.factory.add_to_cart_command'),
+            service('sylius.factory.order_item'),
+            \Sylius\Bundle\ShopBundle\Form\Type\AddToCartType::class,
+            service('sylius.repository.product'),
+            service('sylius.repository.product_variant'),
             service('sylius_product_bundle.factory.add_product_bundle_to_cart_dto'),
             AddProductBundleToCartType::class,
         ])
+        ->call('setLiveResponder', [
+            service('ux.live_component.live_responder'),
+        ])
+        ->tag('sylius.live_component.shop', [
+            'key' => 'sylius_shop:product:add_to_cart_form',
+        ])
     ;
+
+    // Replace Sylius component with our version
+    $services->alias('sylius_shop.twig.component.product.add_to_cart_form', 'sylius_product_bundle.shop.twig.component.product.add_to_cart_form');
 };
